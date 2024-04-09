@@ -1,9 +1,7 @@
 package com.budget.budgetRevamp.controller;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,7 +21,6 @@ import com.budget.budgetRevamp.chartModel.Legend;
 import com.budget.budgetRevamp.chartModel.Scales;
 import com.budget.budgetRevamp.chartModel.Ticks;
 import com.budget.budgetRevamp.chartModel.YAxis;
-import com.budget.budgetRevamp.model.ReportResponse;
 import com.budget.budgetRevamp.service.BudgetChartService;
 
 
