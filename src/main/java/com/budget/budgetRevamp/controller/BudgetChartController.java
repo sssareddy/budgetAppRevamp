@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.budget.budgetRevamp.chartModel.ChartData;
 import com.budget.budgetRevamp.chartModel.ChartDataSet;
 import com.budget.budgetRevamp.chartModel.ChartJson;
@@ -66,7 +65,7 @@ public class BudgetChartController {
 		chartOptions.setLegend(legend);
 		chartJson.setType("bar");
 		chartData.setLabels(labels);
-		chartDataSet.setLabel("item");
+		chartDataSet.setLabel("item2");
 		chartDataSet.setData(data);
 		chartDataSet.setBackgroundColor(backgroundColor);
 		chartJson.setData(chartData);
