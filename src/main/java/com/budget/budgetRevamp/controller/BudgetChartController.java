@@ -65,7 +65,7 @@ public class BudgetChartController {
 		chartOptions.setLegend(legend);
 		chartJson.setType("bar");
 		chartData.setLabels(labels);
-		chartDataSet.setLabel("item");
+		chartDataSet.setLabel("item3");
 		chartDataSet.setData(data);
 		chartDataSet.setBackgroundColor(backgroundColor);
 		chartJson.setData(chartData);
