@@ -28,4 +28,6 @@ public class BudgetDTO {
 	private double totalSum;
 	
 	private String exportFlag;
+	
+	private int rowId;
 }

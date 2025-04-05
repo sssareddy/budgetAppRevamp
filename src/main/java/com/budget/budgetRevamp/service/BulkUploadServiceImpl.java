@@ -6,13 +6,14 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -22,6 +23,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.budget.budgetRevamp.model.BudgetDTO;
 import com.budget.budgetRevamp.model.BudgetEntity;
 import com.budget.budgetRevamp.model.PerticularsEntity;
 import com.budget.budgetRevamp.repository.BudgetRepo;
@@ -43,6 +45,11 @@ public class BulkUploadServiceImpl implements BulkUploadService {
         List<BudgetEntity> data = new ArrayList<>();
         List<PerticularsEntity> perticulars = new ArrayList<>();
         Set<String> uniquePerticulars=new LinkedHashSet<String>();
+        Optional<List<String>> existingPerticulars=perticularsRepo.findByPerticularType("item");
+        List<String> existingPerticularList=new ArrayList<>();
+        if(existingPerticulars.isPresent()) {
+        	existingPerticularList=existingPerticulars.get();
+        }
         XSSFWorkbook workbook = null;
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MMM/yyyy");
 		try {
@@ -65,7 +72,10 @@ public class BulkUploadServiceImpl implements BulkUploadService {
             	budgetEntity.setPurchaseMode(row.getCell(5).getStringCellValue());
             	budgetEntity.setPaymentMode(row.getCell(6).getStringCellValue());
             	budgetEntity.setExportFlag("N");
-            	uniquePerticulars.add(row.getCell(1).getStringCellValue()+","+row.getCell(2).getStringCellValue());
+            	String perticular=row.getCell(1).getStringCellValue()+","+row.getCell(2).getStringCellValue();
+            	if(!existingPerticularList.contains(perticular)) {
+            	uniquePerticulars.add(perticular);
+            	}
             }
             data.add(budgetEntity);
         }  
@@ -138,12 +148,11 @@ public class BulkUploadServiceImpl implements BulkUploadService {
 
 	@Override
 	public String exportBudget() {
-		Resource fileResource=null;
 		List<BudgetEntity> entityList=new ArrayList<>();
-		File exportFile=new File("\\BudgetFiles\\exportBudget.xlsx");
 		try {
 			XSSFWorkbook workbook = new XSSFWorkbook(new FileInputStream("\\BudgetFiles\\exportBudget.xlsx"));
-	    	XSSFSheet sheet = workbook.getSheet("2024");
+			int currYear=Year.now().getValue();
+	    	XSSFSheet sheet = workbook.getSheet(Integer.toString(currYear));
 	    	List<BudgetEntity> updatList=new ArrayList<>();
 	    	entityList=budgetRepo.findAllByexportFlag("N");
 	    	for(BudgetEntity entity:entityList) {
@@ -174,4 +183,31 @@ public class BulkUploadServiceImpl implements BulkUploadService {
 		return "Budget Exported Successfully,Total No Of Rows "+entityList.size();
 	}
 
+	@Override
+	public String updateExportBudget(int rowId,BudgetEntity entity) {
+		try {
+			XSSFWorkbook workbook = new XSSFWorkbook(new FileInputStream("\\BudgetFiles\\exportBudget.xlsx"));
+			int currYear = Year.now().getValue();
+			XSSFSheet sheet = workbook.getSheet(Integer.toString(currYear));
+			Row dataRow = sheet.createRow(rowId);
+			dataRow.createCell(0).setCellValue(entity.getId());
+			dataRow.createCell(1).setCellValue(entity.getItemName());
+			dataRow.createCell(2).setCellValue(entity.getCategoryName());
+			dataRow.createCell(3).setCellValue(entity.getPrice());
+			dataRow.createCell(4).setCellValue(CommonUtill.dateFormattor(entity.getPurchaseDate()));
+			dataRow.createCell(5).setCellValue(entity.getPurchaseMode());
+			dataRow.createCell(6).setCellValue(entity.getPaymentMode());
+			FileOutputStream out = new FileOutputStream(new File("\\BudgetFiles\\exportBudget.xlsx"));
+			workbook.write(out);
+			out.close();
+			workbook.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+		    e.printStackTrace();
+		}
+		return null;
+	}
+  
 }

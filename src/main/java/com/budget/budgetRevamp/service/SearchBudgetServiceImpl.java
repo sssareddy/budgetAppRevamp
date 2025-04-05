@@ -5,6 +5,7 @@ import java.time.Month;
 import java.time.Year;
 import java.time.YearMonth;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -251,20 +252,41 @@ public class SearchBudgetServiceImpl implements SearchBudgetService {
 		LocalDate end = endmonth.atEndOfMonth();
 		List<BudgetEntity> itemList = budgetRepo.findAllItemsByMonth(start, end);
 		Map<String, Double> itemMap = itemList.stream()
-	            .collect(Collectors.groupingBy(BudgetEntity::getItemName, Collectors.summingDouble(BudgetEntity::getPrice)));
-		Map<String, Double> categoryMap = itemList.stream()
-	            .collect(Collectors.groupingBy(BudgetEntity::getCategoryName, Collectors.summingDouble(BudgetEntity::getPrice))).entrySet().stream()
-                .sorted(Map.Entry.comparingByValue())
+	            .collect(Collectors.groupingBy(BudgetEntity::getItemName, Collectors.summingDouble(BudgetEntity::getPrice))).entrySet().stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.comparingDouble(Double::doubleValue).reversed()))
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
                         Map.Entry::getValue,
                         (e1, e2) -> e1,
                         LinkedHashMap::new
                 ));
-		Map<String, Double>  purchaseModeMap = itemList.stream()
-	            .collect(Collectors.groupingBy(BudgetEntity::getPurchaseMode, Collectors.summingDouble(BudgetEntity::getPrice)));
-		Map<String, Double>  paymentModeMap = itemList.stream()
-	            .collect(Collectors.groupingBy(BudgetEntity::getPaymentMode, Collectors.summingDouble(BudgetEntity::getPrice)));
+		Map<String, Double> categoryMap = itemList.stream()
+	            .collect(Collectors.groupingBy(BudgetEntity::getCategoryName, Collectors.summingDouble(BudgetEntity::getPrice))).entrySet().stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.comparingDouble(Double::doubleValue).reversed()))
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (e1, e2) -> e1,
+                        LinkedHashMap::new
+                ));
+		Map<String, Double> purchaseModeMap = itemList.stream()
+	            .collect(Collectors.groupingBy(BudgetEntity::getPurchaseMode, Collectors.summingDouble(BudgetEntity::getPrice))).entrySet().stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.comparingDouble(Double::doubleValue).reversed()))
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (e1, e2) -> e1,
+                        LinkedHashMap::new
+                ));
+		Map<String, Double> paymentModeMap = itemList.stream()
+	            .collect(Collectors.groupingBy(BudgetEntity::getPaymentMode, Collectors.summingDouble(BudgetEntity::getPrice))).entrySet().stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.comparingDouble(Double::doubleValue).reversed()))
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (e1, e2) -> e1,
+                        LinkedHashMap::new
+                ));
 		Map<LocalDate, Double>  purchaseDateMap = itemList.stream()
 	            .collect(Collectors.groupingBy(BudgetEntity::getPurchaseDate, Collectors.summingDouble(BudgetEntity::getPrice)));
 		response.setItemMap(itemMap);

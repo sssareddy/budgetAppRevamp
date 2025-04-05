@@ -39,6 +39,8 @@ public class CommonUtill {
 		itemEntity.setPurchaseDate(purchaseDate);
 		itemEntity.setPurchaseMode(itemRequest.getPurchaseMode());
 		itemEntity.setPaymentMode(itemRequest.getPaymentMode());
+		itemEntity.setExportFlag(itemRequest.getExportFlag());
+		itemEntity.setRowId(itemRequest.getRowId());
 		return itemEntity;
 	}
 

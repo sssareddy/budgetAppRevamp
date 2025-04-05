@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -41,6 +42,9 @@ public class BudgetServiceImpl implements BudgetService {
 	@Autowired
 	PerticularsRepo perticularsRepo;
 	
+	@Autowired
+	BulkUploadService bulkUploadService;
+	
 	
 
 	@Override
@@ -52,9 +56,17 @@ public class BudgetServiceImpl implements BudgetService {
 			if(exisitng.isPresent()) {
 				BudgetEntity entity=exisitng.get();
 				if("Y".equals(entity.getExportFlag())) {
-					
+					BeanUtils.copyProperties(itemRequest, entity,new String[]{"rowId","exportFlag"});					
+					int rowId=entity.getRowId();
+					itemRequest.setExportFlag("Y");
+					itemRequest.setRowId(rowId);
+					bulkUploadService.updateExportBudget(rowId, entity);
+				} else {
+					itemRequest.setExportFlag("N");
 				}
 			}
+		} else {
+			itemRequest.setExportFlag("N");
 		}
 		budgetRepo.save(CommonUtill.mapToEntity(itemRequest));
 		return "Item "+itemRequest.getItemName()+" Added Successfully";

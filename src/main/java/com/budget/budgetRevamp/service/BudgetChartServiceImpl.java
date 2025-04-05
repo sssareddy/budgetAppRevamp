@@ -116,7 +116,7 @@ public class BudgetChartServiceImpl implements BudgetChartService {
                 .filter(val -> val != null)
                 .sorted()
                 .collect(Collectors.toList());
-		 response=CommonUtill.prepareCharts(keysList, valuesList,valuesListSort.get(0).intValue(),valuesListSort.get(valuesListSort.size()-1).intValue(),chartType);
+		 response=CommonUtill.prepareCharts(keysList, valuesList,20000,100000,chartType);
 		return response;
 	}
 
